@@ -9,6 +9,7 @@ from matplotlib.dates import DateFormatter
 from pandas_datareader import data as web
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from statsmodels.tsa.arima.model import ARIMA
+import signalplot
 import datetime
 import matplotlib.pyplot as plt
 import numpy as np
@@ -187,12 +188,7 @@ forecast_index = series.index[series.index >= prediction_start_date][:valid_leng
 end_date = forecast_index[-1]
 
 # Plot setup
-plt.rcParams.update({
-    'axes.grid': False,
-    "font.family": "serif",
-    "axes.spines.top": False,
-    "axes.spines.right": False
-})
+signalplot.apply(font_family='serif')
 fig, ax = plt.subplots(figsize=(12, 5))
 
 # Plot actual series (last 24 months)
