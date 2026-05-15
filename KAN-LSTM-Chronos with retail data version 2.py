@@ -1,5 +1,19 @@
-# Description: Short example for Time Series Forecasting for Retail Sales with MLP ARIMA KAN and Chronos.
+"""Generated from Jupyter notebook: KAN-LSTM-Chronos with retail data version 2
 
+Magics and shell lines are commented out. Run with a normal Python interpreter."""
+
+
+# --- code cell ---
+
+# !pip install pykan  # Jupyter-only
+
+
+# --- code cell ---
+
+# !pip install git+https://github.com/amazon-science/chronos-forecasting.git  # Jupyter-only
+
+
+# --- code cell ---
 
 import datetime
 import random
@@ -8,8 +22,6 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pandas_datareader.data as web
-import signalplot
 import torch
 import torch.nn as nn
 from chronos import ChronosPipeline
@@ -18,20 +30,6 @@ from matplotlib.dates import DateFormatter
 from pandas_datareader import data as web
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from statsmodels.tsa.arima.model import ARIMA
-
-start = datetime.datetime(2000, 1, 1)
-end = datetime.datetime(2025, 4, 1)
-data = web.DataReader("RSAFS", "fred", start, end).dropna()
-
-
-class SimpleMLP(nn.Module):
-    def __init__(self, input_dim):
-        super().__init__()
-        self.fc1 = nn.Linear(input_dim, 64)
-        self.dropout = nn.Dropout(0.2)
-        self.tanh = nn.Tanh()
-        self.fc2 = nn.Linear(64, 1)
-
 
 # Set seed for reproducibility
 seed = 42
@@ -46,7 +44,7 @@ window = 24
 # Load and preprocess data
 start = datetime.datetime(2000, 1, 1)
 end = datetime.datetime(2025, 4, 1)
-series = web.DataReader("RSAFS", "fred", start, end).dropna()["RSAFS"]
+series = web.DataReader("PSAVERT", "fred", start, end).dropna()["PSAVERT"]
 series.index.freq = "MS"
 
 mean_val, std_val = series.mean(), series.std()
@@ -202,10 +200,13 @@ results = pd.DataFrame(
 )
 
 # Plot
+
+
 # Define forecast boundary and zoom range
 prediction_start_date = series.index[-prediction_length]
 zoom_start_date = series.index[-24]
 series_zoom = series[series.index >= zoom_start_date]
+
 
 # Get valid forecast window (based on shortest forecastable length)
 valid_length = min(
@@ -221,7 +222,9 @@ forecast_index = series.index[series.index >= prediction_start_date][:valid_leng
 end_date = forecast_index[-1]
 
 # Plot setup
-signalplot.apply(font_family="serif")
+plt.rcParams.update(
+    {"font.family": "serif", "axes.spines.top": False, "axes.spines.right": False}
+)
 fig, ax = plt.subplots(figsize=(12, 5))
 
 # Plot actual series (last 24 months)
@@ -258,11 +261,18 @@ add_forecast_label(pred_lstm[-valid_length:], "LSTM")
 add_forecast_label(pred_chronos[-valid_length:], "Chronos T5")
 
 # Formatting
-ax.set_ylabel("Sales (Millions USD)")
-ax.set_title("Retail Sales Forecasts (Last 24 Months, Forecast Starts at Grey Line)")
+ax.set_ylabel("Savings (Millions USD)")
+ax.set_title(
+    "Personal Savings Forecasts (Last 24 Months, Forecast Starts at Grey Line)"
+)
 ax.xaxis.set_major_formatter(DateFormatter("%Y-%m"))
 plt.tight_layout()
 plt.savefig("retail_forecast_stream_labels_zoom.png", dpi=300)
 plt.show()
 
 results.reset_index(names="Model", inplace=True)
+
+
+# --- code cell ---
+
+results
