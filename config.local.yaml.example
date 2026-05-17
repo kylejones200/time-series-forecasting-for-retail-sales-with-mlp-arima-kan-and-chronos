@@ -1,0 +1,11 @@
+# Copy to config.local.yaml (gitignored) for machine-specific overrides.
+#
+# data:
+#   source: csv
+#   csv_path: data/rsafs.csv
+#
+# models:
+#   mlp:
+#     epochs: 50
+#   chronos:
+#     enabled: false

@@ -1,16 +1,49 @@
+logging:
+  level: INFO
+
 data:
+  source: fred
+  series_id: RSAFS
+  fred_start: "2000-01-01"
+  fred_end: "2025-04-01"
+  csv_path: data/rsafs.csv
+  date_column: date
+  value_column: value
   seed: 42
-model:
-  alpha: 0.7
-  batch_size: 32
-  learning_rate: 0.03
-  hidden_size: 16
-  dropout: 0.1
+
+forecast:
+  prediction_length: 12
+  window: 24
+
+models:
+  arima:
+    order: [5, 1, 0]
+  mlp:
+    epochs: 200
+    learning_rate: 0.01
+    hidden_size: 64
+    dropout: 0.2
+  kan:
+    epochs: 200
+    learning_rate: 0.01
+    hidden_size: 32
+    grid: 3
+    k: 2
+  lstm:
+    epochs: 200
+    learning_rate: 0.01
+    hidden_size: 32
+  chronos:
+    enabled: true
+    model_id: amazon/chronos-t5-large
+
 output:
-  figures_dir: images
+  figures_dir: outputs/figures
+  results_path: outputs/results.json
+  save_figures: true
+  forecast_chart: retail_forecast_comparison.png
   figure_format: png
-  figure_dpi: 100
+  figure_dpi: 120
   font_family: serif
-  figsize:
-  - 14
-  - 6
+  figsize: [12, 5]
+  zoom_months: 24
