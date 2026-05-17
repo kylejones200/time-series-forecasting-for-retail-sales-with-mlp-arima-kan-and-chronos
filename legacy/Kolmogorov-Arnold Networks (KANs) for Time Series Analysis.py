@@ -69,454 +69,329 @@ def fetch_fred_data(series_id, api_key, start_date="2000-01-01", save_csv=False)
         raise Exception(f"API request failed with status code {response.status_code}")
 
 
-def main() -> None:
-    np.random.seed(42)
-
-    time = np.linspace(0, 10, 500)
-
-    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
-
-    df = pd.DataFrame({"time": time, "value": values})
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
-
-    plt.xlabel("Time")
-
-    plt.ylabel("Value")
-
-    plt.title("Synthetic Time Series Data")
-
-    plt.legend()
-
-    plt.show()
-
-    np.random.seed(42)
-
-    time = np.linspace(0, 10, 500)
-
-    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
-
-    df = pd.DataFrame({"time": time, "value": values})
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
-
-    plt.xlabel("Time")
-
-    plt.ylabel("Value")
-
-    plt.title("Synthetic Time Series Data")
-
-    plt.legend()
-
-    plt.show()
-
-    X = np.array(df["time"]).reshape(-1, 1)
-
-    y = np.array(df["value"]).reshape(-1, 1)
-
-    scaler_X = MinMaxScaler()
-
-    scaler_y = MinMaxScaler()
-
-    X = scaler_X.fit_transform(X)
-
-    y = scaler_y.fit_transform(y)
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-
-    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-
-    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-
-    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
-
-    input_dim = 1
-
-    hidden_dim = 10
-
-    output_dim = 1
-
-    learning_rate = 0.01
-
-    num_epochs = 100
-
-    model = KolmogorovArnoldNetwork(input_dim, hidden_dim, output_dim)
-
-    criterion = nn.MSELoss()
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    for epoch in range(num_epochs):
-        outputs = model(X_train_tensor)
-        loss = criterion(outputs, y_train_tensor)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        if (epoch + 1) % 10 == 0:
-            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
-
-    model.eval()
-
-    with torch.no_grad():
-        predictions = model(X_test_tensor)
-        predictions = scaler_y.inverse_transform(predictions.numpy())
-        y_test_actual = scaler_y.inverse_transform(y_test_tensor.numpy())
-
-    plt.figure(figsize=(10, 6))
-
-    plt.scatter(y_test_actual, predictions, alpha=0.7)
-
-    plt.plot(
-        [min(y_test_actual), max(y_test_actual)],
-        [min(y_test_actual), max(y_test_actual)],
-        color="red",
-    )
-
-    plt.xlabel("Actual Values")
-
-    plt.ylabel("Predicted Values")
-
-    plt.title("KAN Predictions vs Actual")
-
+def grid() -> None:
     plt.grid()
-
     plt.show()
 
-    np.random.seed(42)
 
-    time = np.linspace(0, 10, 500)
-
-    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
-
-    df = pd.DataFrame({"time": time, "value": values})
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
-
-    plt.xlabel("Time")
-
-    plt.ylabel("Value")
-
-    plt.title("Synthetic Time Series Data")
-
-    plt.legend()
-
-    plt.show()
-
-    X = np.array(df["time"]).reshape(-1, 1)
-
-    y = np.array(df["value"]).reshape(-1, 1)
-
-    scaler_X = MinMaxScaler()
-
-    scaler_y = MinMaxScaler()
-
-    X = scaler_X.fit_transform(X)
-
-    y = scaler_y.fit_transform(y)
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-
-    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-
-    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-
-    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
-
-    input_dim = 1
-
-    hidden_dim = 10
-
-    output_dim = 1
-
-    learning_rate = 0.01
-
-    num_epochs = 100
-
-    model = KolmogorovArnoldNetwork(input_dim, hidden_dim, output_dim)
-
-    criterion = nn.MSELoss()
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    for epoch in range(num_epochs):
-        outputs = model(X_train_tensor)
-        loss = criterion(outputs, y_train_tensor)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        if (epoch + 1) % 10 == 0:
-            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
-
-    model.eval()
-
-    with torch.no_grad():
-        predictions = model(X_test_tensor)
-        predictions = scaler_y.inverse_transform(predictions.numpy())
-        y_test_actual = scaler_y.inverse_transform(y_test_tensor.numpy())
-
-    plt.figure(figsize=(10, 6))
-
-    plt.scatter(y_test_actual, predictions, alpha=0.7)
-
-    plt.plot(
-        [min(y_test_actual), max(y_test_actual)],
-        [min(y_test_actual), max(y_test_actual)],
-        color="red",
-    )
-
-    plt.xlabel("Actual Values")
-
-    plt.ylabel("Predicted Values")
-
-    plt.title("KAN Predictions vs Actual")
-
+def grid_2() -> None:
     plt.grid()
-
     plt.show()
 
-    X = df.drop("value", axis=1)
 
-    y = df["value"]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-    scaler = StandardScaler()
-
-    X_train = scaler.fit_transform(X_train)
-
-    X_test = scaler.transform(X_test)
-
-    model = KAN(width=[X_train.shape[1], 10, 1], grid=5, k=3)
-
-    model.fit(X_train, y_train)
-
-    y_pred = model.predict(X_test)
-
-    accuracy = accuracy_score(y_test, y_pred)
-
-    print("Accuracy:", accuracy)
-
-    np.random.seed(42)
-
-    time = np.linspace(0, 10, 500)
-
-    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
-
-    df = pd.DataFrame({"time": time, "value": values})
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
-
-    plt.xlabel("Time")
-
-    plt.ylabel("Value")
-
-    plt.title("Synthetic Time Series Data")
-
-    plt.legend()
-
+def grid_3() -> None:
+    plt.grid()
     plt.show()
 
-    X = np.array(df["time"]).reshape(-1, 1)
 
-    y = np.array(df["value"]).reshape(-1, 1)
-
-    scaler_X = MinMaxScaler()
-
-    scaler_y = MinMaxScaler()
-
-    X = scaler_X.fit_transform(X)
-
-    y = scaler_y.fit_transform(y)
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-
-    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-
-    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-
-    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
-
-    input_dim = 1
-
-    hidden_dim = 10
-
-    output_dim = 1
-
-    learning_rate = 0.01
-
-    num_epochs = 100
-
-    model = SimpleNN(input_dim, hidden_dim, output_dim)
-
-    criterion = nn.MSELoss()
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    for epoch in range(num_epochs):
-        outputs = model(X_train_tensor)
-        loss = criterion(outputs, y_train_tensor)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        if (epoch + 1) % 10 == 0:
-            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
-
-    model.eval()
-
+def main_step_012() -> None:
     with torch.no_grad():
         predictions = model(X_test_tensor)
         predictions = scaler_y.inverse_transform(predictions.numpy())
         y_test_actual = scaler_y.inverse_transform(y_test_tensor.numpy())
-
     plt.figure(figsize=(10, 6))
-
     plt.scatter(y_test_actual, predictions, alpha=0.7)
-
     plt.plot(
         [min(y_test_actual), max(y_test_actual)],
         [min(y_test_actual), max(y_test_actual)],
         color="red",
     )
-
     plt.xlabel("Actual Values")
-
     plt.ylabel("Predicted Values")
-
     plt.title("Neural Network Predictions vs Actual")
-
     plt.grid()
-
-    plt.show()
-
-    mse = np.mean((predictions - y_test_actual) ** 2)
-
-    print(f"Mean Squared Error: {mse:.4f}")
-
-    api_key = "8f058d10ec8c788296c040ea09e634d5"
-
-    series_id = "T10Y2Y"
-
-    df = fetch_fred_data(series_id, api_key)
-
-    print("Data fetched successfully.")
-
-    df["time"] = (df.index - df.index[0]).days
-
-    X = df["time"].values.reshape(-1, 1)
-
-    y = df["value"].values.reshape(-1, 1)
-
-    scaler_X = MinMaxScaler()
-
-    scaler_y = MinMaxScaler()
-
-    X = scaler_X.fit_transform(X)
-
-    y = scaler_y.fit_transform(y)
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-
-    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-
-    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-
-    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
-
-    input_dim = 1
-
-    hidden_dim = 10
-
-    output_dim = 1
-
-    learning_rate = 0.01
-
-    num_epochs = 100
-
-    model = SimpleNN(input_dim, hidden_dim, output_dim)
-
-    criterion = nn.MSELoss()
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    for epoch in range(num_epochs):
-        outputs = model(X_train_tensor)
-        loss = criterion(outputs, y_train_tensor)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        if (epoch + 1) % 10 == 0:
-            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
-
-    model.eval()
-
-    with torch.no_grad():
-        predictions = model(X_test_tensor)
-        predictions = scaler_y.inverse_transform(predictions.numpy())
-        y_test_actual = scaler_y.inverse_transform(y_test_tensor.numpy())
-
-    plt.figure(figsize=(10, 6))
-
-    plt.scatter(y_test_actual, predictions, alpha=0.7)
-
-    plt.plot(
-        [min(y_test_actual), max(y_test_actual)],
-        [min(y_test_actual), max(y_test_actual)],
-        color="red",
-    )
-
-    plt.xlabel("Actual Values")
-
-    plt.ylabel("Predicted Values")
-
-    plt.title("Neural Network Predictions vs Actual")
-
-    plt.grid()
-
     plt.savefig("NN_Predictions_vs_Actual.png")
-
     plt.show()
 
+
+def prepare_mse() -> None:
     mse = np.mean((predictions - y_test_actual) ** 2)
-
     print(f"Mean Squared Error: {mse:.4f}")
+    api_key = "8f058d10ec8c788296c040ea09e634d5"
+    series_id = "T10Y2Y"
+    df = fetch_fred_data(series_id, api_key)
+    print("Data fetched successfully.")
+    df["time"] = (df.index - df.index[0]).days
+    X = df["time"].values.reshape(-1, 1)
+    y = df["value"].values.reshape(-1, 1)
+    scaler_X = MinMaxScaler()
+    scaler_y = MinMaxScaler()
+    X = scaler_X.fit_transform(X)
+    y = scaler_y.fit_transform(y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
+    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
+    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+    input_dim = 1
+    hidden_dim = 10
+    output_dim = 1
+    learning_rate = 0.01
+    num_epochs = 100
+    model = SimpleNN(input_dim, hidden_dim, output_dim)
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    for epoch in range(num_epochs):
+        outputs = model(X_train_tensor)
+        loss = criterion(outputs, y_train_tensor)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        if (epoch + 1) % 10 == 0:
+            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
+    model.eval()
 
+
+def prepare_mse_2() -> None:
+    mse = np.mean((predictions - y_test_actual) ** 2)
+    print(f"Mean Squared Error: {mse:.4f}")
     plt.figure(figsize=(12, 6))
-
     plt.plot(df.index, scaler_y.inverse_transform(y), label="Original Data", alpha=0.7)
-
     plt.scatter(
         df.index[int(0.8 * len(df)) :], predictions, color="red", label="NN Predictions", alpha=0.7
     )
-
     plt.xlabel("Date")
-
     plt.ylabel("Value")
-
     plt.title("Time Series with Neural Network Predictions")
-
     plt.legend()
-
     plt.savefig("NN_Time_Series_Predictions.png")
-
     plt.show()
 
+
+def prepare_x() -> None:
+    X = np.array(df["time"]).reshape(-1, 1)
+    y = np.array(df["value"]).reshape(-1, 1)
+    scaler_X = MinMaxScaler()
+    scaler_y = MinMaxScaler()
+    X = scaler_X.fit_transform(X)
+    y = scaler_y.fit_transform(y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
+    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
+    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+    input_dim = 1
+    hidden_dim = 10
+    output_dim = 1
+    learning_rate = 0.01
+    num_epochs = 100
+    model = KolmogorovArnoldNetwork(input_dim, hidden_dim, output_dim)
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    for epoch in range(num_epochs):
+        outputs = model(X_train_tensor)
+        loss = criterion(outputs, y_train_tensor)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        if (epoch + 1) % 10 == 0:
+            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
+    model.eval()
+    with torch.no_grad():
+        predictions = model(X_test_tensor)
+        predictions = scaler_y.inverse_transform(predictions.numpy())
+        y_test_actual = scaler_y.inverse_transform(y_test_tensor.numpy())
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test_actual, predictions, alpha=0.7)
+    plt.plot(
+        [min(y_test_actual), max(y_test_actual)],
+        [min(y_test_actual), max(y_test_actual)],
+        color="red",
+    )
+    plt.xlabel("Actual Values")
+    plt.ylabel("Predicted Values")
+    plt.title("KAN Predictions vs Actual")
+
+
+def prepare_x_2() -> None:
+    X = np.array(df["time"]).reshape(-1, 1)
+    y = np.array(df["value"]).reshape(-1, 1)
+    scaler_X = MinMaxScaler()
+    scaler_y = MinMaxScaler()
+    X = scaler_X.fit_transform(X)
+    y = scaler_y.fit_transform(y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
+    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
+    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+    input_dim = 1
+    hidden_dim = 10
+    output_dim = 1
+    learning_rate = 0.01
+    num_epochs = 100
+    model = KolmogorovArnoldNetwork(input_dim, hidden_dim, output_dim)
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    for epoch in range(num_epochs):
+        outputs = model(X_train_tensor)
+        loss = criterion(outputs, y_train_tensor)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        if (epoch + 1) % 10 == 0:
+            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
+    model.eval()
+    with torch.no_grad():
+        predictions = model(X_test_tensor)
+        predictions = scaler_y.inverse_transform(predictions.numpy())
+        y_test_actual = scaler_y.inverse_transform(y_test_tensor.numpy())
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test_actual, predictions, alpha=0.7)
+    plt.plot(
+        [min(y_test_actual), max(y_test_actual)],
+        [min(y_test_actual), max(y_test_actual)],
+        color="red",
+    )
+    plt.xlabel("Actual Values")
+    plt.ylabel("Predicted Values")
+    plt.title("KAN Predictions vs Actual")
+
+
+def prepare_x_3() -> None:
+    X = df.drop("value", axis=1)
+    y = df["value"]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    model = KAN(width=[X_train.shape[1], 10, 1], grid=5, k=3)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy:", accuracy)
+    np.random.seed(42)
+    time = np.linspace(0, 10, 500)
+    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
+    df = pd.DataFrame({"time": time, "value": values})
+    plt.figure(figsize=(10, 6))
+    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
+    plt.xlabel("Time")
+    plt.ylabel("Value")
+    plt.title("Synthetic Time Series Data")
+    plt.legend()
+    plt.show()
+
+
+def prepare_x_4() -> None:
+    X = np.array(df["time"]).reshape(-1, 1)
+    y = np.array(df["value"]).reshape(-1, 1)
+    scaler_X = MinMaxScaler()
+    scaler_y = MinMaxScaler()
+    X = scaler_X.fit_transform(X)
+    y = scaler_y.fit_transform(y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
+    y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
+    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+    input_dim = 1
+    hidden_dim = 10
+    output_dim = 1
+    learning_rate = 0.01
+    num_epochs = 100
+    model = SimpleNN(input_dim, hidden_dim, output_dim)
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    for epoch in range(num_epochs):
+        outputs = model(X_train_tensor)
+        loss = criterion(outputs, y_train_tensor)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        if (epoch + 1) % 10 == 0:
+            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
+    model.eval()
+    with torch.no_grad():
+        predictions = model(X_test_tensor)
+        predictions = scaler_y.inverse_transform(predictions.numpy())
+        y_test_actual = scaler_y.inverse_transform(y_test_tensor.numpy())
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test_actual, predictions, alpha=0.7)
+    plt.plot(
+        [min(y_test_actual), max(y_test_actual)],
+        [min(y_test_actual), max(y_test_actual)],
+        color="red",
+    )
+    plt.xlabel("Actual Values")
+    plt.ylabel("Predicted Values")
+    plt.title("Neural Network Predictions vs Actual")
+
+
+def print() -> None:
     print("Forecasting completed and visualizations saved.")
+
+
+def seed() -> None:
+    np.random.seed(42)
+    time = np.linspace(0, 10, 500)
+    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
+    df = pd.DataFrame({"time": time, "value": values})
+    plt.figure(figsize=(10, 6))
+    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
+    plt.xlabel("Time")
+    plt.ylabel("Value")
+    plt.title("Synthetic Time Series Data")
+    plt.legend()
+    plt.show()
+
+
+def seed_2() -> None:
+    np.random.seed(42)
+    time = np.linspace(0, 10, 500)
+    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
+    df = pd.DataFrame({"time": time, "value": values})
+    plt.figure(figsize=(10, 6))
+    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
+    plt.xlabel("Time")
+    plt.ylabel("Value")
+    plt.title("Synthetic Time Series Data")
+    plt.legend()
+    plt.show()
+
+
+def seed_3() -> None:
+    np.random.seed(42)
+    time = np.linspace(0, 10, 500)
+    values = 10 + 2 * np.sin(time) + 0.5 * np.random.normal(size=len(time))
+    df = pd.DataFrame({"time": time, "value": values})
+    plt.figure(figsize=(10, 6))
+    plt.plot(df["time"], df["value"], label="Synthetic Time Series")
+    plt.xlabel("Time")
+    plt.ylabel("Value")
+    plt.title("Synthetic Time Series Data")
+    plt.legend()
+    plt.show()
+
+
+def main() -> None:
+    seed()
+
+    seed_2()
+
+    prepare_x()
+
+    grid()
+
+    seed_3()
+
+    prepare_x_2()
+
+    grid_2()
+
+    prepare_x_3()
+
+    prepare_x_4()
+
+    grid_3()
+
+    prepare_mse()
+
+    main_step_012()
+
+    prepare_mse_2()
+
+    print()
 
 
 if __name__ == "__main__":
