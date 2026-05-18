@@ -7,7 +7,6 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import requests
 import torch
 import torch.nn as nn
 from kan import KAN
@@ -41,32 +40,27 @@ class SimpleNN(nn.Module):
         return x
 
 
-def fetch_fred_data(series_id, api_key, start_date="2000-01-01", save_csv=False):
-    params = {
-        "series_id": series_id,
-        "api_key": api_key,
-        "file_type": "json",
-        "observation_start": start_date,
-        "observation_end": datetime.now().strftime("%Y-%m-%d"),
-    }
-    url = "https://api.stlouisfed.org/fred/series/observations"
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        observations = data["observations"]
-        df = pd.DataFrame(observations)
-        df["date"] = pd.to_datetime(df["date"])
-        df["value"] = pd.to_numeric(df["value"], errors="coerce")
-        df = df.dropna()
-        df = df.sort_values("date")
-        df = df.set_index("date")
-        if save_csv:
-            csv_filename = f"{series_id}_data.csv"
-            df.to_csv(csv_filename)
-            print(f"Data saved to {csv_filename}")
-        return df
-    else:
-        raise Exception(f"API request failed with status code {response.status_code}")
+def fetch_fred_data(series_id, start_date="2000-01-01", end_date=None, save_csv=False):
+    """Fetch data from FRED via pandas_datareader."""
+    import pandas_datareader.data as web
+
+    if end_date is None:
+        end_date = datetime.now()
+    start = pd.to_datetime(start_date)
+    end = pd.to_datetime(end_date)
+    raw = web.DataReader(series_id, "fred", start, end)
+    df = raw.reset_index()
+    date_col = "DATE" if "DATE" in df.columns else df.columns[0]
+    value_col = series_id if series_id in df.columns else df.columns[-1]
+    df = df.rename(columns={date_col: "date", value_col: "value"})
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+    df = df.dropna(subset=["value"]).sort_values("date")
+    df = df.set_index("date")
+    if save_csv:
+        csv_filename = f"{series_id}_data.csv"
+        df.to_csv(csv_filename)
+        print(f"Data saved to {csv_filename}")
+    return df
 
 
 def grid() -> None:
@@ -107,9 +101,8 @@ def main_step_012() -> None:
 def prepare_mse() -> None:
     mse = np.mean((predictions - y_test_actual) ** 2)
     print(f"Mean Squared Error: {mse:.4f}")
-    api_key = "8f058d10ec8c788296c040ea09e634d5"
     series_id = "T10Y2Y"
-    df = fetch_fred_data(series_id, api_key)
+    df = fetch_fred_data_nixtla(series_id)
     print("Data fetched successfully.")
     df["time"] = (df.index - df.index[0]).days
     X = df["time"].values.reshape(-1, 1)
@@ -121,8 +114,8 @@ def prepare_mse() -> None:
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
     y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-    y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+    torch.tensor(X_test, dtype=torch.float32)
+    torch.tensor(y_test, dtype=torch.float32)
     input_dim = 1
     hidden_dim = 10
     output_dim = 1
@@ -366,31 +359,18 @@ def seed_3() -> None:
 
 def main() -> None:
     seed()
-
     seed_2()
-
     prepare_x()
-
     grid()
-
     seed_3()
-
     prepare_x_2()
-
     grid_2()
-
     prepare_x_3()
-
     prepare_x_4()
-
     grid_3()
-
     prepare_mse()
-
     main_step_012()
-
     prepare_mse_2()
-
     print()
 
 

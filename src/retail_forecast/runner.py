@@ -37,33 +37,27 @@ def run(
         path = Path(config_path) if config_path else DEFAULT_CONFIG_PATH
         cfg = load_config(path)
     configure_logging(cfg)
-
     data_cfg = cfg.get("data") or {}
     seed = int(data_cfg.get("seed", 42))
     set_seeds(seed)
-
     forecast_cfg = cfg.get("forecast") or {}
     prediction_length = int(forecast_cfg.get("prediction_length", 12))
     window = int(forecast_cfg.get("window", 24))
-
     series = load_series(cfg)
     norm_series, mean_val, std_val = normalize_series(series)
     split = split_series(series, norm_series, window=window, prediction_length=prediction_length)
     tensors = build_lagged_tensors(split, window)
-
     arima_cfg = model_cfg(cfg, "arima")
     order_list = arima_cfg.get("order", [5, 1, 0])
     order = tuple(int(x) for x in order_list)
-
     predictions: list[ModelPrediction] = [
         fit_arima(
             split.train_raw,
             split.test_raw,
-            order=order,  # type: ignore[arg-type]
+            order=order,
             prediction_length=prediction_length,
         )
     ]
-
     mlp_cfg = model_cfg(cfg, "mlp")
     predictions.append(
         fit_mlp(
@@ -75,7 +69,6 @@ def run(
             dropout=float(mlp_cfg.get("dropout", 0.2)),
         )
     )
-
     kan_cfg = model_cfg(cfg, "kan")
     predictions.append(
         fit_kan(
@@ -88,7 +81,6 @@ def run(
             k=int(kan_cfg.get("k", 2)),
         )
     )
-
     lstm_cfg = model_cfg(cfg, "lstm")
     predictions.append(
         fit_lstm(
@@ -98,12 +90,9 @@ def run(
             hidden_size=int(lstm_cfg.get("hidden_size", 32)),
         )
     )
-
     chronos_cfg = model_cfg(cfg, "chronos")
     use_chronos = (
-        bool(chronos_cfg.get("enabled", True))
-        if include_chronos is None
-        else include_chronos
+        bool(chronos_cfg.get("enabled", True)) if include_chronos is None else include_chronos
     )
     if use_chronos:
         predictions.append(
@@ -121,10 +110,8 @@ def run(
         y_test_norm=tensors.y_test,
         prediction_length=prediction_length,
     )
-
     results = results_dataframe(y_actual, predictions)
     logger.info("\n%s", results.to_string())
-
     out_cfg = cfg.get("output") or {}
     figure_path: Path | None = None
     if out_cfg.get("save_figures", True):
@@ -142,7 +129,6 @@ def run(
 
         results_path = resolve_project_path(results_path)
     results_path.parent.mkdir(parents=True, exist_ok=True)
-
     payload = {
         "version": __version__,
         "series_id": str(data_cfg.get("series_id", "RSAFS")),
@@ -152,7 +138,6 @@ def run(
     }
     results_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     logger.info("Wrote %s", results_path)
-
     return {
         "series": series,
         "results": results,

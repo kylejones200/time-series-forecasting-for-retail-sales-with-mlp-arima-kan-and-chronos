@@ -21,11 +21,9 @@ def main() -> None:
     args = parser.parse_args()
     cfg = load_config(args.config)
     series = load_series(cfg)
-
     data_cfg = cfg.get("data") or {}
     out_path = resolve_project_path(data_cfg.get("csv_path", "data/rsafs.csv"))
     out_path.parent.mkdir(parents=True, exist_ok=True)
-
     frame = series.rename("value").to_frame()
     frame.index.name = "date"
     frame.reset_index().to_csv(out_path, index=False)

@@ -32,19 +32,16 @@ def save_forecast_comparison(
 ) -> Path:
     out_cfg = cfg.get("output") or {}
     _apply_plot_style(cfg)
-
     zoom_months = int(out_cfg.get("zoom_months", 24))
     prediction_start = series.index[-prediction_length]
     zoom_start = series.index[-min(zoom_months, len(series))]
     series_zoom = series[series.index >= zoom_start]
-
     valid_length = min(
         prediction_length,
         *(len(p.values) for p in predictions),
     )
     forecast_index = series.index[series.index >= prediction_start][:valid_length]
     end_date = forecast_index[-1]
-
     fig, ax = plt.subplots(figsize=tuple(out_cfg.get("figsize", [12, 5])))
     ax.plot(
         series_zoom.index,
@@ -54,7 +51,6 @@ def save_forecast_comparison(
         linewidth=2,
     )
     ax.axvline(prediction_start, color="lightgray", linestyle="--", linewidth=1)
-
     styles = {
         "ARIMA": {"linestyle": "--"},
         "MLP": {},
@@ -83,7 +79,6 @@ def save_forecast_comparison(
     ax.set_title("Retail Sales Forecasts (zoomed; grey line = forecast start)")
     ax.xaxis.set_major_formatter(DateFormatter("%Y-%m"))
     plt.tight_layout()
-
     figures_dir = resolve_project_path(out_cfg.get("figures_dir", "outputs/figures"))
     figures_dir.mkdir(parents=True, exist_ok=True)
     chart_name = out_cfg.get("forecast_chart", "retail_forecast_comparison.png")

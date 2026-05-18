@@ -17,7 +17,6 @@ def fast_config(tmp_path: Path) -> dict:
     values = 400_000 + rng.normal(0, 1000, len(idx)).cumsum()
     csv_path = tmp_path / "series.csv"
     pd.DataFrame({"date": idx, "value": values}).to_csv(csv_path, index=False)
-
     return {
         "logging": {"level": "WARNING"},
         "data": {

@@ -186,7 +186,6 @@ def denormalize_predictions(
     y_actual = y_test_norm * std_val + mean_val
     valid_length = min(len(y_actual), prediction_length)
     y_actual = y_actual[-valid_length:]
-
     denormed: list[ModelPrediction] = []
     for pred in predictions:
         values = pred.values

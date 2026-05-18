@@ -15,7 +15,6 @@ import torch.nn as nn
 from chronos import ChronosPipeline
 from kan import KAN
 from matplotlib.dates import DateFormatter
-from pandas_datareader import data as web
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from statsmodels.tsa.arima.model import ARIMA
 
@@ -88,9 +87,7 @@ arima_time = time.time() - start_arima
 class MLP(nn.Module):
     def __init__(self, dim):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(dim, 64), nn.Tanh(), nn.Dropout(0.2), nn.Linear(64, 1)
-        )
+        self.net = nn.Sequential(nn.Linear(dim, 64), nn.Tanh(), nn.Dropout(0.2), nn.Linear(64, 1))
 
     def forward(self, x):
         return self.net(x)
@@ -225,9 +222,7 @@ signalplot.apply(font_family="serif")
 fig, ax = plt.subplots(figsize=(12, 5))
 
 # Plot actual series (last 24 months)
-ax.plot(
-    series_zoom.index, series_zoom.values, label="Actual", color="black", linewidth=2
-)
+ax.plot(series_zoom.index, series_zoom.values, label="Actual", color="black", linewidth=2)
 
 # Add forecast start boundary
 ax.axvline(prediction_start_date, color="lightgray", linestyle="--", linewidth=1)

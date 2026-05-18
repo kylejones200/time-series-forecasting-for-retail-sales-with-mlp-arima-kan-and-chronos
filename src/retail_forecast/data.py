@@ -21,7 +21,6 @@ def load_series(cfg: dict[str, Any]) -> pd.Series:
     """Load a monthly FRED series or a local CSV for offline use."""
     data_cfg = cfg.get("data") or {}
     source = str(data_cfg.get("source", "fred")).lower()
-
     if source == "csv":
         csv_path = resolve_project_path(data_cfg.get("csv_path", "data/rsafs.csv"))
         date_col = str(data_cfg.get("date_column", "date"))
