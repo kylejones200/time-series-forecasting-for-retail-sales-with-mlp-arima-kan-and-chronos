@@ -5,6 +5,14 @@ Medium: [Time Series Forecasting for Retail Sales with MLP, ARIMA, KAN, and Chro
 
 Benchmarks ARIMA, MLP, KAN, LSTM, and Amazon Chronos on FRED retail sales (`RSAFS`). Companion code for the article (`article.md`).
 
+## Business context
+
+Retail forecasting is high-stakes. Misses mean stockouts, markdowns, or investor panic. ARIMA is the legacy tool: fast, interpretable, consistent. Newer models like LSTMs and KANs claim to capture nonlinearity. Transformers promise everything.
+
+We tested all of them using U.S. retail sales and updated the results through April 2025. The outcomes reflect real-world constraints: fixed forecast window, same input features, same evaluation horizon.
+
+We pulled seasonally adjusted U.S. Retail and Food Services Sales from the FRED API:
+
 ## Quick start
 
 Requires [uv](https://docs.astral.sh/uv/).
